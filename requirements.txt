@@ -1,0 +1,9 @@
+Flask
+Flask-Session
+Werkzeug
+mediapipe
+numpy
+matplotlib
+opencv-python
+fer
+moviepy
