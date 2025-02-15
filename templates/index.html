@@ -5,71 +5,199 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Posture Analysis - Home</title>
     <style>
-        /* Smooth Page Transition */
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --secondary-color: #7c3aed;
+            --secondary-hover: #6d28d9;
+            --text-color: #f8fafc;
+            --container-bg: rgba(15, 23, 42, 0.8);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             margin: 0;
             padding: 0;
             background: url('/static/bg.jpg') no-repeat center center/cover;
             background-size: cover;
             background-attachment: fixed;
-            color: white;
-            text-align: center;
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             opacity: 0;
             transition: opacity 0.5s ease-in-out;
         }
+
         body.loaded {
             opacity: 1;
         }
+
         .container {
-            padding: 100px 20px;
+            background: var(--container-bg);
+            padding: clamp(40px, 8vw, 80px) clamp(20px, 5vw, 40px);
+            border-radius: 24px;
+            width: min(95%, 900px);
+            margin: 20px;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            text-align: center;
         }
+
         h1 {
-            font-size: 48px;
-            margin-bottom: 20px;
+            font-size: clamp(32px, 6vw, 48px);
+            margin-bottom: 24px;
+            background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 700;
+            line-height: 1.2;
         }
+
         p {
-            font-size: 20px;
+            font-size: clamp(16px, 3vw, 20px);
             max-width: 800px;
-            margin: 0 auto 30px;
+            margin: 0 auto 40px;
+            line-height: 1.6;
+            color: rgba(255, 255, 255, 0.9);
         }
+
+        .btn-wrapper {
+            display: inline-block;
+            position: relative;
+            overflow: hidden;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            padding: 2px;
+        }
+
         .btn {
             display: inline-block;
-            padding: 15px 30px;
-            font-size: 20px;
-            font-weight: bold;
+            padding: 16px 40px;
+            font-size: clamp(16px, 2.5vw, 20px);
+            font-weight: 600;
             color: white;
-            background: #9b40b7;
+            background: var(--primary-color);
             border: none;
-            border-radius: 30px;
+            border-radius: 14px;
             text-decoration: none;
-            transition: 0.3s ease;
             cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 1;
+            overflow: hidden;
         }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .btn:hover::before {
+            opacity: 1;
+        }
+
         .btn:hover {
-            background: #FF00FF;
-            transform: scale(1.1);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(79, 70, 229, 0.4);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 24px;
+            margin-top: 48px;
+            text-align: left;
+        }
+
+        .feature {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 24px;
+            border-radius: 16px;
+            transition: transform 0.3s ease;
+        }
+
+        .feature:hover {
+            transform: translateY(-5px);
+        }
+
+        .feature h3 {
+            color: #818cf8;
+            margin-bottom: 12px;
+            font-size: 20px;
+        }
+
+        .feature p {
+            font-size: 16px;
+            margin-bottom: 0;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 40px 20px;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-
     <div class="container">
         <h1>Posture Analysis System</h1>
-        <p>Improve your work-from-home experience with real-time posture analysis.  
+        <p>Improve your work-from-home experience with real-time posture analysis. 
            Upload your video, get feedback, and maintain a healthy posture effortlessly.</p>
-           <a href="{{ url_for('upload') }}"><button>Get Started</button></a>
+        
+        <div class="btn-wrapper">
+            <a href="{{ url_for('upload') }}" class="btn">Get Started</a>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <h3>Real-time Analysis</h3>
+                <p>Get instant feedback on your posture with our advanced AI system</p>
+            </div>
+            <div class="feature">
+                <h3>Personalized Feedback</h3>
+                <p>Receive customized recommendations to improve your sitting position</p>
+            </div>
+            <div class="feature">
+                <h3>Easy to Use</h3>
+                <p>Simple upload process and clear, actionable insights</p>
+            </div>
+        </div>
     </div>
 
     <script>
         // Smooth Fade-in on Load
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             document.body.classList.add("loaded");
         });
 
         // Smooth Fade-out on Navigation
         document.querySelectorAll("a").forEach(link => {
-            link.addEventListener("click", function (e) {
+            link.addEventListener("click", function(e) {
                 e.preventDefault();
                 let destination = this.href;
                 document.body.style.opacity = "0";
@@ -79,6 +207,5 @@
             });
         });
     </script>
-
 </body>
 </html>

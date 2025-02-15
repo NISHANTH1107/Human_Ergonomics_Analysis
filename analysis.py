@@ -153,15 +153,15 @@ class PostureAnalyzer:
         sentiment = self.analyze_sentiment(image_rgb)
 
         return PostureMetrics(
-            neck_angle=neck_angle,
-            back_angle=back_angle,
-            shoulder_symmetry=shoulder_symmetry,
-            hip_alignment=hip_alignment,
-            hip_deviation_angle=hip_deviation_angle,
-            back_bend_severity=back_strain,
-            neck_strain_severity=neck_strain,
-            sentiment=sentiment
-        )
+        neck_angle=round(neck_angle, 4),
+        back_angle=round(back_angle, 4),
+        shoulder_symmetry=round(shoulder_symmetry, 4),
+        hip_alignment=round(hip_alignment, 4),
+        hip_deviation_angle=round(hip_deviation_angle, 4),
+        back_bend_severity=back_strain,
+        neck_strain_severity=neck_strain,
+        sentiment=sentiment
+    )
 
     def analyze_video(self, video_path: str) -> Tuple[str, List[PostureMetrics]]:
         clip = VideoFileClip(video_path)
@@ -270,15 +270,14 @@ class PostureAnalyzer:
         return report
     
     def calculate_average_metrics(self, metrics_list: List[PostureMetrics]) -> Optional[PostureMetrics]:
-    
         if not metrics_list:
             return None
 
-        avg_neck_angle = sum(m.neck_angle for m in metrics_list) / len(metrics_list)
-        avg_back_angle = sum(m.back_angle for m in metrics_list) / len(metrics_list)
-        avg_shoulder_symmetry = sum(m.shoulder_symmetry for m in metrics_list) / len(metrics_list)
-        avg_hip_alignment = sum(m.hip_alignment for m in metrics_list) / len(metrics_list)
-        avg_hip_deviation_angle = sum(m.hip_deviation_angle for m in metrics_list) / len(metrics_list)
+        avg_neck_angle = round(sum(m.neck_angle for m in metrics_list) / len(metrics_list), 4)
+        avg_back_angle = round(sum(m.back_angle for m in metrics_list) / len(metrics_list), 4)
+        avg_shoulder_symmetry = round(sum(m.shoulder_symmetry for m in metrics_list) / len(metrics_list), 4)
+        avg_hip_alignment = round(sum(m.hip_alignment for m in metrics_list) / len(metrics_list), 4)
+        avg_hip_deviation_angle = round(sum(m.hip_deviation_angle for m in metrics_list) / len(metrics_list), 4)
 
         avg_back_bend_severity = self.assess_strain_level(avg_back_angle, self.thresholds['back'], is_vertical=True)
         avg_neck_strain_severity = self.assess_strain_level(avg_neck_angle, self.thresholds['neck'])

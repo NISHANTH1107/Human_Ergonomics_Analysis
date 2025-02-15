@@ -5,43 +5,244 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Posture Analysis Result</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f0f2f5;
-            margin: 0;
-            padding: 20px;
-            text-align: center;
-            color: #333;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        h1, h2 {
-            color: #0a84ff;
-        }
-        ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        ul li {
-            font-size: 18px;
-            margin: 10px 0;
-            text-align: left;
-        }
-        video {
-            width: 100%;
-            max-width: 640px;
-            max-height: 80vh; /* Ensures video doesn't overflow screen height */
-            border: 2px solid #ccc;
-            border-radius: 10px;
-            object-fit: contain; /* Ensures video fits while maintaining aspect ratio */
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --secondary-color: #7c3aed;
+            --secondary-hover: #6d28d9;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --danger-color: #ef4444;
+            --text-color: #f8fafc;
+            --container-bg: rgba(15, 23, 42, 0.8);
         }
 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            margin: 0;
+            min-height: 100vh;
+            background: url('/static/bg.jpg') no-repeat center center/cover;
+            background-size: cover;
+            background-attachment: fixed;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: clamp(10px, 3vw, 20px);
+        }
+
+        .container {
+            width: 100%;
+            max-width: min(95vw, 1000px);
+            margin: auto;
+            padding: clamp(15px, 4vw, 40px);
+            background: var(--container-bg);
+            backdrop-filter: blur(12px);
+            border-radius: clamp(16px, 3vw, 24px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            overflow-x: hidden;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: clamp(24px, 5vw, 36px);
+            margin-bottom: clamp(20px, 4vw, 32px);
+            background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-align: center;
+            padding: 0 clamp(10px, 2vw, 20px);
+        }
+
+        h2 {
+            font-size: clamp(18px, 3.5vw, 24px);
+            color: #818cf8;
+            margin: clamp(20px, 4vw, 32px) 0 clamp(10px, 2vw, 16px);
+            text-align: left;
+            padding: 0 clamp(10px, 2vw, 20px);
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            margin: clamp(15px, 3vw, 24px) 0;
+            border-radius: clamp(12px, 2vw, 16px);
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0 clamp(10px, 2vw, 20px);
+        }
+
+        video {
+            width: 100%;
+            max-height: min(70vh, 600px);
+            border-radius: clamp(12px, 2vw, 16px);
+            object-fit: contain;
+            object-align: center;
+            background: #000;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr));
+            gap: clamp(12px, 2vw, 20px);
+            margin: clamp(15px, 3vw, 24px) 0;
+            padding: 0 clamp(10px, 2vw, 20px);
+        }
+
+        .metric-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: clamp(15px, 3vw, 20px);
+            border-radius: clamp(12px, 2vw, 16px);
+            transition: transform 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        @media (hover: hover) {
+            .metric-card:hover {
+                transform: translateY(-2px);
+                background: rgba(255, 255, 255, 0.08);
+            }
+        }
+
+        .metric-label {
+            font-size: clamp(12px, 2vw, 14px);
+            color: #94a3b8;
+        }
+
+        .metric-value {
+            font-size: clamp(18px, 3vw, 24px);
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .evaluation {
+            background: rgba(255, 255, 255, 0.05);
+            padding: clamp(15px, 3vw, 24px);
+            border-radius: clamp(12px, 2vw, 16px);
+            margin: clamp(10px, 2vw, 20px) clamp(10px, 2vw, 20px); /* Adjusted top margin */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .evaluation p {
+            font-size: clamp(16px, 2.5vw, 20px);
+            margin-top: clamp(8px, 1.5vw, 12px);
+        }
+
+        .feedback {
+            padding: clamp(15px, 3vw, 20px);
+            border-radius: clamp(12px, 2vw, 16px);
+            margin: clamp(15px, 3vw, 24px) clamp(10px, 2vw, 20px);
+            font-size: clamp(14px, 2.5vw, 18px);
+            line-height: 1.6;
+        }
+
+        .feedback.warning {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid var(--warning-color);
+        }
+
+        .feedback.danger {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid var(--danger-color);
+        }
+
+        .feedback.success {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--success-color);
+        }
+
+        .button-container {
+            text-align: center;
+            padding: clamp(10px, 2vw, 20px);
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: clamp(12px, 2.5vw, 14px) clamp(20px, 4vw, 28px);
+            background: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: clamp(8px, 1.5vw, 12px);
+            font-weight: 500;
+            font-size: clamp(14px, 2.5vw, 16px);
+            transition: all 0.3s ease;
+            width: min(100%, 200px);
+        }
+
+        @media (hover: hover) {
+            .back-button:hover {
+                background: var(--primary-hover);
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+            }
+        }
+
+        .back-button:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: clamp(12px, 3vw, 15px);
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .metric-card {
+                padding: 15px;
+            }
+
+            .video-container {
+                margin: 15px 0;
+            }
+
+            .feedback, .evaluation {
+                margin: 15px 10px;
+                padding: 15px;
+            }
+        }
+
+        @media (min-width: 481px) and (max-width: 768px) {
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 769px) {
+            .metrics-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .metric-card, .back-button {
+                transition: none;
+            }
+        }
+
+        @supports not (backdrop-filter: blur(12px)) {
+            .container {
+                background: rgba(15, 23, 42, 0.95);
+            }
+        }
     </style>
 </head>
 <body>
@@ -49,55 +250,93 @@
         <h1>Posture Analysis Result</h1>
 
         <h2>Processed Video</h2>
-        <video controls>
-            <source src="{{ url_for('static', filename=result['output_video']) }}" type="video/mp4">
-            Your browser does not support the video tag.
-        </video>
+        <div class="video-container">
+            <video controls playsinline>
+                <source src="{{ url_for('static', filename=result['output_video']) }}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
         
-        <h2>Average Posture Metrics</h2>
-        <ul>
-            <li>Neck Angle: {{ result['average_metrics'].neck_angle }}°</li>
-            <li>Back Angle: {{ result['average_metrics'].back_angle }}°</li>
-            <li>Shoulder Symmetry: {{ result['average_metrics'].shoulder_symmetry }}%</li>
-            <li>Hip Alignment: {{ result['average_metrics'].hip_alignment }}%</li>
-            <li>Hip Deviation Angle: {{ result['average_metrics'].hip_deviation_angle }}°</li>
-            <li>Sentiment: {{ result['average_metrics'].sentiment }}</li>
-        </ul>
-        
-        <!-- Display overall strain prediction -->
-        <h2>Overall Strain Evaluation:</h2>
-        <p>{{ result['overall_strain'] }}</p>
+        <h2>Posture Metrics</h2>
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">Neck Angle</div>
+                <div class="metric-value">{{ result['average_metrics'].neck_angle }}°</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Back Angle</div>
+                <div class="metric-value">{{ result['average_metrics'].back_angle }}°</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Shoulder Symmetry</div>
+                <div class="metric-value">{{ result['average_metrics'].shoulder_symmetry }}%</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Hip Alignment</div>
+                <div class="metric-value">{{ result['average_metrics'].hip_alignment }}%</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Hip Deviation</div>
+                <div class="metric-value">{{ result['average_metrics'].hip_deviation_angle }}°</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-label">Sentiment</div>
+                <div class="metric-value">{{ result['average_metrics'].sentiment }}</div>
+            </div>
+        </div>
 
-        <!-- Display Feedback -->
-        <h2>Feedback:</h2>
-        <p style="font-weight: bold; color: {% if result['overall_strain'] == 'Straining' %}red{% else %}green{% endif %};">
+        <div class="evaluation">
+            <h2>Overall Strain Evaluation</h2>
+            <p>{{ result['overall_strain'] }}</p>
+        </div>
+
+        <h2>Feedback</h2>
+        <div class="feedback {{ 'danger' if result['overall_strain'] == 'Straining' else 'success' }}">
             {{ result['feedback'] }}
-        </p>
+        </div>
 
-        <!-- Back Button -->
-        <a href="{{ url_for('clear_results') }}" style="display: inline-block; margin-top: 20px; padding: 10px 20px; 
-        background-color: #ff4d4d; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
-        ⬅ Back to Home
-        </a>
-
+        <div class="button-container">
+            <a href="{{ url_for('clear_results') }}" class="back-button">
+                ← Back to Home
+            </a>
+        </div>
     </div>
+
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const video = document.getElementById("processedVideo");
-    
-            video.addEventListener("loadedmetadata", function () {
+        document.addEventListener("DOMContentLoaded", function() {
+            const video = document.querySelector("video");
+            
+            video.addEventListener("loadedmetadata", function() {
                 const aspectRatio = video.videoWidth / video.videoHeight;
-    
-                // Adjust video container size dynamically based on aspect ratio
-                if (aspectRatio < 1) { // Portrait Video
-                    video.style.width = "60%";
-                    video.style.maxHeight = "80vh";
-                } else { // Landscape or Square Video
-                    video.style.width = "100%";
-                    video.style.maxHeight = "none";
+                const container = document.querySelector('.video-container');
+                
+                if (aspectRatio < 1) { // Portrait video
+                    const maxHeight = Math.min(window.innerHeight * 0.7, 600);
+                    video.style.height = maxHeight + 'px';
+                    video.style.width = 'auto';
+                } else { // Landscape or square video
+                    video.style.width = '100%';
+                    video.style.height = 'auto';
+                }
+                
+                container.style.height = video.offsetHeight + 'px';
+            });
+
+            // Recalculate on resize
+            window.addEventListener('resize', function() {
+                if (video.videoWidth) {
+                    const aspectRatio = video.videoWidth / video.videoHeight;
+                    if (aspectRatio < 1) {
+                        const maxHeight = Math.min(window.innerHeight * 0.7, 600);
+                        video.style.height = maxHeight + 'px';
+                        video.style.width = 'auto';
+                    } else {
+                        video.style.width = '100%';
+                        video.style.height = 'auto';
+                    }
                 }
             });
         });
-    </script>    
+    </script>
 </body>
 </html>
