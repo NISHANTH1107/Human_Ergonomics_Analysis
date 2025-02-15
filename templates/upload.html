@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Posture Analysis Upload</title>
+    <style>
+        /* Smooth Page Transition */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            background: url('/static/bg.jpg') no-repeat center center/cover;
+            background-size: cover;
+            color: white;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        body.loaded {
+            opacity: 1;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.7); /* Adds a dark overlay for readability */
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: left;
+        }
+        h2 {
+            font-size: 28px;
+            margin-bottom: 10px;
+            color: #00b7ff;
+        }
+        p {
+            font-size: 16px;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+        input[type="file"] {
+            padding: 12px;
+            border-radius: 5px;
+            background: #9b40b7;
+            color: white;
+            font-size: 16px;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+            width: 100%;
+        }
+        input[type="file"]:hover {
+            background: #6e3db4;
+            transform: scale(1.05);
+        }
+        button {
+            margin-top: 20px;
+            padding: 12px 24px;
+            border-radius: 5px;
+            background: #0a84ff;
+            color: white;
+            font-size: 18px;
+            border: none;
+            cursor: pointer;
+            transition: 0.3s;
+            width: 100%;
+        }
+        button:hover {
+            background: #0056b3;
+            transform: scale(1.05);
+        }
+        #video-container {
+            margin-top: 20px;
+            display: none;
+        }
+        video {
+            width: 100%;
+            max-width: 500px;
+            max-height: 400px; /* Prevents portrait videos from taking over */
+            border: 2px solid white;
+            border-radius: 8px;
+            object-fit: contain; /* Ensures video fits without distortion */
+        }
+
+        .description {
+            margin-top: 20px;
+            font-size: 16px;
+        }
+        .description p {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+        /* Loading Spinner */
+        #loading-spinner {
+            display: none;
+            margin-top: 20px;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        #loading-animation {
+            border: 5px solid #f3f3f3; /* Light gray */
+            border-top: 5px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 10px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #video-container {
+            max-height: 450px; /* Ensures the video container doesn’t take up too much space */
+            overflow: hidden;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Work-from-Home Ergonomics Assistant</h2>
+        <h2>Upload Video for Posture and Sentiment Analysis</h2>
+        <form id="uploadForm" action="{{ url_for('upload') }}" method="post" enctype="multipart/form-data">
+            <input id="videoUpload" type="file" name="file" accept="video/*" required>
+            <button id="uploadButton" type="submit">Upload and Analyze</button>
+        </form>
+
+        <div id="video-container">
+            <h3>Uploaded Video</h3>
+            <video id="videoPlayer" controls></video>
+        </div>
+
+        <!-- Loading Spinner -->
+        <div id="loading-spinner">
+            <p>Processing your video, please wait...</p>
+            <div id="loading-animation"></div>
+        </div>
+
+        <div class="description">
+            <p>🔸 <strong>Camera Position:</strong> Ensure the camera captures your full upper body for better posture analysis.</p>
+            <p>🔸 <strong>Lighting:</strong> Avoid dark or overexposed areas for accurate analysis.</p>
+            <p>🔸 <strong>Background:</strong> Use a plain background to minimize distractions.</p>
+            <p>🔸 <strong>Video Duration:</strong> Keep the video short and clear (e.g., 30–60 seconds is ideal).</p>
+        </div>
+    </div>
+
+    <script>
+        // Smooth Fade-in on Load
+        document.addEventListener("DOMContentLoaded", function () {
+            document.body.classList.add("loaded");
+        });
+
+        // Video Upload & Display
+        document.getElementById('videoUpload').addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const videoURL = URL.createObjectURL(file);
+                document.getElementById('videoPlayer').src = videoURL;
+                document.getElementById('video-container').style.display = 'block';
+    
+            // Adjust height for portrait videos
+            videoPlayer.onloadedmetadata = function() {
+                if (videoPlayer.videoHeight > videoPlayer.videoWidth) {
+                    videoPlayer.style.height = "400px";  // Limit tall videos
+                } else {
+                    videoPlayer.style.height = "auto";   // Keep landscape videos normal
+                }
+            };
+        }
+        });
+
+        // Show loading spinner on form submission
+        document.getElementById('uploadForm').addEventListener('submit', function() {
+            document.getElementById('loading-spinner').style.display = 'block';
+            document.getElementById('uploadButton').disabled = true;  // Disable button to prevent multiple submissions
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Posture Analysis - Home</title>
+    <style>
+        /* Smooth Page Transition */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: url('/static/bg.jpg') no-repeat center center/cover;
+            background-size: cover;
+            background-attachment: fixed;
+            color: white;
+            text-align: center;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+        body.loaded {
+            opacity: 1;
+        }
+        .container {
+            padding: 100px 20px;
+        }
+        h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 20px;
+            max-width: 800px;
+            margin: 0 auto 30px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 15px 30px;
+            font-size: 20px;
+            font-weight: bold;
+            color: white;
+            background: #9b40b7;
+            border: none;
+            border-radius: 30px;
+            text-decoration: none;
+            transition: 0.3s ease;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background: #FF00FF;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Posture Analysis System</h1>
+        <p>Improve your work-from-home experience with real-time posture analysis.  
+           Upload your video, get feedback, and maintain a healthy posture effortlessly.</p>
+           <a href="{{ url_for('upload') }}"><button>Get Started</button></a>
+    </div>
+
+    <script>
+        // Smooth Fade-in on Load
+        document.addEventListener("DOMContentLoaded", function () {
+            document.body.classList.add("loaded");
+        });
+
+        // Smooth Fade-out on Navigation
+        document.querySelectorAll("a").forEach(link => {
+            link.addEventListener("click", function (e) {
+                e.preventDefault();
+                let destination = this.href;
+                document.body.style.opacity = "0";
+                setTimeout(() => {
+                    window.location.href = destination;
+                }, 500);
+            });
+        });
+    </script>
+
+</body>
+</html>

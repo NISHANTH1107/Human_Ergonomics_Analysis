@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Posture Analysis Result</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1, h2 {
+            color: #0a84ff;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        ul li {
+            font-size: 18px;
+            margin: 10px 0;
+            text-align: left;
+        }
+        video {
+            width: 100%;
+            max-width: 640px;
+            max-height: 80vh; /* Ensures video doesn't overflow screen height */
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            object-fit: contain; /* Ensures video fits while maintaining aspect ratio */
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Posture Analysis Result</h1>
+
+        <h2>Processed Video</h2>
+        <video controls>
+            <source src="{{ url_for('static', filename=result['output_video']) }}" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        
+        <h2>Average Posture Metrics</h2>
+        <ul>
+            <li>Neck Angle: {{ result['average_metrics'].neck_angle }}°</li>
+            <li>Back Angle: {{ result['average_metrics'].back_angle }}°</li>
+            <li>Shoulder Symmetry: {{ result['average_metrics'].shoulder_symmetry }}%</li>
+            <li>Hip Alignment: {{ result['average_metrics'].hip_alignment }}%</li>
+            <li>Hip Deviation Angle: {{ result['average_metrics'].hip_deviation_angle }}°</li>
+            <li>Sentiment: {{ result['average_metrics'].sentiment }}</li>
+        </ul>
+        
+        <!-- Display overall strain prediction -->
+        <h2>Overall Strain Evaluation:</h2>
+        <p>{{ result['overall_strain'] }}</p>
+
+        <!-- Display Feedback -->
+        <h2>Feedback:</h2>
+        <p style="font-weight: bold; color: {% if result['overall_strain'] == 'Straining' %}red{% else %}green{% endif %};">
+            {{ result['feedback'] }}
+        </p>
+
+        <!-- Back Button -->
+        <a href="{{ url_for('clear_results') }}" style="display: inline-block; margin-top: 20px; padding: 10px 20px; 
+        background-color: #ff4d4d; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">
+        ⬅ Back to Home
+        </a>
+
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const video = document.getElementById("processedVideo");
+    
+            video.addEventListener("loadedmetadata", function () {
+                const aspectRatio = video.videoWidth / video.videoHeight;
+    
+                // Adjust video container size dynamically based on aspect ratio
+                if (aspectRatio < 1) { // Portrait Video
+                    video.style.width = "60%";
+                    video.style.maxHeight = "80vh";
+                } else { // Landscape or Square Video
+                    video.style.width = "100%";
+                    video.style.maxHeight = "none";
+                }
+            });
+        });
+    </script>    
+</body>
+</html>
