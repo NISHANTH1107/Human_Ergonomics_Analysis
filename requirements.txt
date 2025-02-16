@@ -6,4 +6,4 @@ numpy
 matplotlib
 opencv-python
 fer
-moviepy
+moviepy==1.0.3

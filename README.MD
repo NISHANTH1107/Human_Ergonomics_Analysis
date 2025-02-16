@@ -14,7 +14,7 @@ and **FFmpeg** for video processing.
 ---
 
 ## 🌐 Live Demo
-Try out the application here : [example.com](example.com)
+Try out the application here : [Human Ergonomics Analyzer](https://human-ergonomics-analysis.onrender.com)
 
 ## 🛠️ Installation & Setup
 
