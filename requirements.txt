@@ -8,3 +8,4 @@ opencv-python==4.8.1.78
 fer==22.4.0
 moviepy==1.0.3
 pandas==2.1.3
+tensorflow==2.15.0
