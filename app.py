@@ -1,9 +1,12 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for, session, jsonify
 from flask_session import Session
 import os
 import subprocess  # For video conversion
 from analysis import PostureAnalyzer  # Import your analysis class
 from werkzeug.utils import secure_filename
+import tempfile
+import numpy as np
+import cv2
 
 app = Flask(__name__)
 app.static_folder = 'static'
@@ -98,6 +101,61 @@ def upload():
         return redirect(url_for('result'))
 
     return render_template('upload.html')
+
+
+@app.route('/analyze_frame', methods=['POST'])
+def analyze_frame():
+    """Analyzes a single frame from webcam and returns the posture metrics."""
+    if 'frame' not in request.files:
+        return jsonify({"error": "No frame part"}), 400
+
+    frame_file = request.files['frame']
+    
+    # Save the frame to a temporary file
+    temp_dir = tempfile.gettempdir()
+    temp_frame_path = os.path.join(temp_dir, 'temp_frame.jpg')
+    frame_file.save(temp_frame_path)
+    
+    # Read the image with OpenCV
+    frame = cv2.imread(temp_frame_path)
+    
+    if frame is None:
+        return jsonify({"error": "Invalid frame data"}), 400
+    
+    # Initialize the analyzer and process the frame
+    analyzer = PostureAnalyzer()
+    annotated_frame, metrics = analyzer.analyze_image(frame)
+    
+    # Clean up the temporary file
+    os.remove(temp_frame_path)
+    
+    if metrics is None:
+        # If no pose detected, return default values
+        return jsonify({
+            "back_angle": "N/A",
+            "neck_angle": "N/A",
+            "shoulder_symmetry": "N/A",
+            "status": "No pose detected"
+        })
+    
+    # Evaluate posture status
+    status = "Good Posture"
+    if (metrics.back_bend_severity.value != "No strain" or 
+        metrics.neck_strain_severity.value != "No strain"):
+        status = "Improve Posture"
+    
+    # Return the metrics in JSON format
+    return jsonify({
+        "back_angle": round(metrics.back_angle, 1),
+        "neck_angle": round(metrics.neck_angle, 1),
+        "shoulder_symmetry": round(metrics.shoulder_symmetry, 1),
+        "hip_alignment": round(metrics.hip_alignment, 1),
+        "hip_deviation_angle": round(metrics.hip_deviation_angle, 1),
+        "back_strain": metrics.back_bend_severity.value,
+        "neck_strain": metrics.neck_strain_severity.value,
+        "sentiment": metrics.sentiment,
+        "status": status
+    })
 
 
 @app.route('/result')

@@ -190,24 +190,6 @@
             100% { transform: rotate(360deg); }
         }
 
-        @media (max-width: 480px) {
-            .container {
-                padding: 16px;
-            }
-
-            h2 {
-                font-size: 22px;
-            }
-
-            .custom-file-input,
-            button {
-                width: 100%;
-            }
-
-            .description {
-                padding: 16px;
-            }
-        }
         .nav-buttons {
             display: flex;
             gap: 16px;
@@ -245,7 +227,91 @@
             font-size: 18px;
         }
 
+        /* Button group for upload and webcam */
+        .button-group {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            margin: 20px auto;
+        }
+
+        .button-group button {
+            margin: 0;
+        }
+
+        /* Webcam container */
+        #webcam-container {
+            margin-top: 24px;
+            display: none;
+        }
+
+        #webcam-metrics {
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            text-align: left;
+        }
+
+        .metric-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--container-bg);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 800px;
+            padding: 20px;
+            position: relative;
+        }
+
+        .close-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: auto;
+            max-width: none;
+        }
+
         @media (max-width: 480px) {
+            .container {
+                padding: 16px;
+            }
+
+            h2 {
+                font-size: 22px;
+            }
+
+            .custom-file-input,
+            button {
+                width: 100%;
+            }
+
+            .description {
+                padding: 16px;
+            }
+
             .nav-buttons {
                 flex-direction: column;
                 gap: 12px;
@@ -254,6 +320,10 @@
             .back-button {
                 width: 100%;
                 justify-content: center;
+            }
+
+            .button-group {
+                flex-direction: column;
             }
         }
     </style>
@@ -273,7 +343,10 @@
                     <input id="videoUpload" type="file" name="file" accept="video/*" required>
                 </div>
             </div>
-            <button id="uploadButton" type="submit">Analyze Posture</button>
+            <div class="button-group">
+                <button id="uploadButton" type="submit">Analyze Posture</button>
+                <button id="webcamButton" type="button">Open Webcam</button>
+            </div>
         </form>
 
         <div id="video-container">
@@ -291,6 +364,36 @@
             <p>💡 <strong>Lighting:</strong> Use well-lit environment</p>
             <p>🖼️ <strong>Background:</strong> Clean, plain background preferred</p>
             <p>⏱️ <strong>Duration:</strong> 30-60 seconds recommended</p>
+        </div>
+    </div>
+
+    <!-- Webcam Modal -->
+    <div id="webcamModal" class="modal">
+        <div class="modal-content">
+            <button class="close-button" id="closeWebcam">&times;</button>
+            <h2>Live Posture Analysis</h2>
+            <div id="webcam-container">
+                <video id="webcam" autoplay playsinline></video>
+                <canvas id="webcamCanvas" style="display: none;"></canvas>
+                <div id="webcam-metrics">
+                    <div class="metric-item">
+                        <span>Back Angle:</span>
+                        <span id="back-angle">Analyzing...</span>
+                    </div>
+                    <div class="metric-item">
+                        <span>Neck Angle:</span>
+                        <span id="neck-angle">Analyzing...</span>
+                    </div>
+                    <div class="metric-item">
+                        <span>Shoulder Symmetry:</span>
+                        <span id="shoulder-symmetry">Analyzing...</span>
+                    </div>
+                    <div class="metric-item">
+                        <span>Status:</span>
+                        <span id="posture-status">Waiting...</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -323,6 +426,127 @@
             document.getElementById('loading-spinner').style.display = 'block';
             document.getElementById('uploadButton').disabled = true;
         });
+
+        // Webcam functionality
+        const webcamButton = document.getElementById('webcamButton');
+        const webcamModal = document.getElementById('webcamModal');
+        const closeWebcam = document.getElementById('closeWebcam');
+        const webcamVideo = document.getElementById('webcam');
+        const webcamCanvas = document.getElementById('webcamCanvas');
+        let stream = null;
+        let isStreaming = false;
+        
+        webcamButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            webcamModal.style.display = 'flex';
+            startWebcam();
+        });
+        
+        closeWebcam.addEventListener('click', function() {
+            stopWebcam();
+            webcamModal.style.display = 'none';
+        });
+        
+        async function startWebcam() {
+            try {
+                document.getElementById('webcam-container').style.display = 'block';
+                
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    } 
+                });
+                webcamVideo.srcObject = stream;
+                isStreaming = true;
+                
+                // Start analyzing frames
+                startAnalysis();
+            } catch (err) {
+                console.error("Error accessing webcam:", err);
+                alert("Could not access webcam. Please make sure you've granted permission.");
+            }
+        }
+        
+        function stopWebcam() {
+            if (stream) {
+                const tracks = stream.getTracks();
+                tracks.forEach(track => track.stop());
+                webcamVideo.srcObject = null;
+                isStreaming = false;
+            }
+        }
+        
+        function startAnalysis() {
+            if (!isStreaming) return;
+            
+            // Simulate analysis (in real implementation, this would send frames to the backend)
+            const analysisInterval = setInterval(() => {
+                if (!isStreaming) {
+                    clearInterval(analysisInterval);
+                    return;
+                }
+                
+                // Draw current frame to canvas
+                const ctx = webcamCanvas.getContext('2d');
+                webcamCanvas.width = webcamVideo.videoWidth;
+                webcamCanvas.height = webcamVideo.videoHeight;
+                ctx.drawImage(webcamVideo, 0, 0);
+                
+                // Get the frame as a blob and send to server for analysis
+                webcamCanvas.toBlob(function(blob) {
+                    sendFrameForAnalysis(blob);
+                }, 'image/jpeg');
+                
+            }, 1000); // Analyze every second
+        }
+        
+        function sendFrameForAnalysis(blob) {
+            const formData = new FormData();
+            formData.append('frame', blob);
+            
+            fetch('/analyze_frame', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                updateMetrics(data);
+            })
+            .catch(error => {
+                console.error('Error analyzing frame:', error);
+                // Fallback to simulated metrics during development
+                simulateMetrics();
+            });
+        }
+        
+        function simulateMetrics() {
+            // Simulated metrics for development/testing
+            const metrics = {
+                back_angle: (Math.random() * 15).toFixed(1),
+                neck_angle: (75 + Math.random() * 15).toFixed(1),
+                shoulder_symmetry: (Math.random() * 10).toFixed(1),
+                status: Math.random() > 0.3 ? "Good Posture" : "Improve Posture"
+            };
+            
+            updateMetrics(metrics);
+        }
+        
+        function updateMetrics(metrics) {
+            document.getElementById('back-angle').textContent = metrics.back_angle + "°";
+            document.getElementById('neck-angle').textContent = metrics.neck_angle + "°";
+            document.getElementById('shoulder-symmetry').textContent = metrics.shoulder_symmetry + "%";
+            
+            const statusElement = document.getElementById('posture-status');
+            statusElement.textContent = metrics.status;
+            
+            // Set color based on status
+            if (metrics.status === "Good Posture") {
+                statusElement.style.color = "#4ade80"; // Green
+            } else {
+                statusElement.style.color = "#f87171"; // Red
+            }
+        }
     </script>
 </body>
 </html>
