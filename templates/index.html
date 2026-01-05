@@ -1,211 +1,1100 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Posture Analysis - Home</title>
-    <style>
-        :root {
-            --primary-color: #4f46e5;
-            --primary-hover: #4338ca;
-            --secondary-color: #7c3aed;
-            --secondary-hover: #6d28d9;
-            --text-color: #f8fafc;
-            --container-bg: rgba(15, 23, 42, 0.8);
-        }
+<html>
 
+<head>
+    <title>Home - Human Ergonomics Assistant</title>
+    <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: url('/static/bg.jpg') no-repeat center center/cover;
-            background-size: cover;
-            background-attachment: fixed;
-            color: var(--text-color);
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
             min-height: 100vh;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: #4f46e5;
             display: flex;
             align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.5s ease-in-out;
+            gap: 10px;
         }
 
-        body.loaded {
-            opacity: 1;
+        .nav {
+            display: flex;
+            gap: 30px;
+            align-items: center;
         }
 
-        .container {
-            background: var(--container-bg);
-            padding: clamp(40px, 8vw, 80px) clamp(20px, 5vw, 40px);
-            border-radius: 24px;
-            width: min(95%, 900px);
-            margin: 20px;
-            backdrop-filter: blur(12px);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        .nav a {
+            text-decoration: none;
+            color: #4b5563;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .nav a:hover,
+        .nav a.active {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info span {
+            color: #4b5563;
+            font-weight: 500;
+        }
+
+        .logout-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+        }
+
+        .main-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+
+        .page-title {
+            font-size: 36px;
+            color: #1f2937;
+            margin-bottom: 40px;
             text-align: center;
         }
 
-        h1 {
-            font-size: clamp(32px, 6vw, 48px);
-            margin-bottom: 24px;
-            background: linear-gradient(135deg, #818cf8 0%, #6366f1 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            color: transparent;
-            font-weight: 700;
-            line-height: 1.2;
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 40px;
+            margin-bottom: 40px;
         }
 
-        p {
-            font-size: clamp(16px, 3vw, 20px);
-            max-width: 800px;
-            margin: 0 auto 40px;
-            line-height: 1.6;
-            color: rgba(255, 255, 255, 0.9);
-        }
-
-        .btn-wrapper {
-            display: inline-block;
-            position: relative;
-            overflow: hidden;
+        .card {
+            background: white;
             border-radius: 16px;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            padding: 2px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .card-title {
+            font-size: 24px;
+            color: #1f2937;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .card-title i {
+            font-size: 28px;
+        }
+
+        .camera-container {
+            position: relative;
+            background: #1f2937;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .camera-placeholder {
+            color: white;
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .camera-placeholder i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .camera-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 20px;
+            padding: 15px;
+            background: #f3f4f6;
+            border-radius: 10px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #10b981;
+        }
+
+        .status-dot.recording {
+            background: #ef4444;
+            animation: pulse 1.5s infinite;
+        }
+
+        .status-dot.paused {
+            background: #f59e0b;
+        }
+
+        @keyframes pulse {
+            0% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+
+            100% {
+                opacity: 1;
+            }
+        }
+
+        .session-controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 30px;
         }
 
         .btn {
-            display: inline-block;
-            padding: 16px 40px;
-            font-size: clamp(16px, 2.5vw, 20px);
-            font-weight: 600;
-            color: white;
-            background: var(--primary-color);
+            padding: 12px;
             border: none;
-            border-radius: 14px;
-            text-decoration: none;
+            border-radius: 10px;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            z-index: 1;
-            overflow: hidden;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            z-index: -1;
+        .btn-primary {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
         }
 
-        .btn:hover::before {
-            opacity: 1;
-        }
-
-        .btn:hover {
+        .btn-primary:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(79, 70, 229, 0.4);
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.3);
         }
 
-        .btn:active {
-            transform: translateY(0);
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #4b5563;
         }
 
-        .features {
+        .btn-secondary:hover:not(:disabled) {
+            background: #e5e7eb;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            background: #dc2626;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .timer-section {
+            margin-bottom: 30px;
+        }
+
+        .timer-display {
+            font-size: 48px;
+            font-weight: 700;
+            color: #4f46e5;
+            text-align: center;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 12px;
+            border: 3px solid #e5e7eb;
+        }
+
+        .timer-controls {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 24px;
-            margin-top: 48px;
-            text-align: left;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
         }
 
-        .feature {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 24px;
-            border-radius: 16px;
-            transition: transform 0.3s ease;
+        .timer-inputs {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-top: 20px;
         }
 
-        .feature:hover {
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            color: #6b7280;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .input-group input {
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .session-stats {
+            margin-top: 30px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 2px solid #e5e7eb;
+        }
+
+        .stats-title {
+            color: #4b5563;
+            font-size: 18px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .stat-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #4f46e5;
+        }
+
+        .posture-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .metric {
+            background: #f3f4f6;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .metric-label {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 5px;
+        }
+
+        .metric-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #1f2937;
+        }
+
+        .metric-value.good {
+            color: #10b981;
+        }
+
+        .metric-value.warning {
+            color: #f59e0b;
+        }
+
+        .metric-value.danger {
+            color: #ef4444;
+        }
+
+        .stretches-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .stretch-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s;
+        }
+
+        .stretch-card:hover {
             transform: translateY(-5px);
         }
 
-        .feature h3 {
-            color: #818cf8;
-            margin-bottom: 12px;
-            font-size: 20px;
+        .stretch-card h3 {
+            color: #1f2937;
+            margin-bottom: 10px;
         }
 
-        .feature p {
-            font-size: 16px;
-            margin-bottom: 0;
+        .stretch-card p {
+            color: #6b7280;
+            font-size: 14px;
+            line-height: 1.5;
+            margin-bottom: 15px;
         }
 
-        @media (max-width: 480px) {
-            .container {
-                padding: 40px 20px;
+        .see-more {
+            color: #4f46e5;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .see-more:hover {
+            text-decoration: underline;
+        }
+
+        .time-left {
+            text-align: center;
+            margin-top: 10px;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .time-left .value {
+            font-weight: 600;
+            color: #4f46e5;
+        }
+
+        @media (max-width: 1200px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
             }
 
-            .features {
+            .stretches-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav {
+                gap: 15px;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .page-title {
+                font-size: 28px;
+            }
+
+            .stretches-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .posture-metrics {
+                grid-template-columns: 1fr;
+            }
+
+            .session-controls {
+                grid-template-columns: 1fr;
+            }
+
+            .timer-controls {
+                grid-template-columns: 1fr;
+            }
+
+            .timer-inputs {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
                 grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
+
 <body>
-    <div class="container">
-        <h1>Posture Analysis System</h1>
-        <p>Improve your work-from-home experience with real-time posture analysis. 
-           Upload your video, get feedback, and maintain a healthy posture effortlessly.</p>
-        
-        <div class="btn-wrapper">
-            <a href="{{ url_for('upload') }}" class="btn">Get Started</a>
+    <div class="header">
+        <div class="logo">
+            <span>🧘</span>
+            <span>Human Ergonomics Assistant</span>
+        </div>
+        <div class="nav">
+            <a href="{{ url_for('index') }}" class="active">Home</a>
+            <a href="{{ url_for('statistics') }}">View Statistics</a>
+            <a href="{{ url_for('ergo_chat') }}">Ergo Chat</a>
+        </div>
+        <div class="user-info">
+            <span>Welcome, {{ username }}</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <h1 class="page-title">Live Posture Monitoring</h1>
+
+        <div class="dashboard-grid">
+            <div class="card">
+                <h2 class="card-title">
+                    <span>📷</span>
+                    Live Camera Feed
+                </h2>
+
+                <div class="camera-container">
+                    <video id="cam" autoplay></video>
+                    <div class="camera-placeholder" id="cameraPlaceholder">
+                        <span>📹</span>
+                        Camera feed will appear here
+                    </div>
+                </div>
+
+                <div class="camera-status">
+                    <div class="status-dot" id="statusDot"></div>
+                    <span id="statusText">Camera ready</span>
+                </div>
+
+                <div class="posture-metrics" id="postureMetrics">
+                    <!-- Metrics will be populated by JavaScript -->
+                    <div class="metric">
+                        <div class="metric-label">Neck Angle</div>
+                        <div class="metric-value">--°</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Back Angle</div>
+                        <div class="metric-value">--°</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Shoulder Symmetry</div>
+                        <div class="metric-value">--%</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-label">Posture Status</div>
+                        <div class="metric-value">--</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">
+                    <span>⏱️</span>
+                    Session Timer & Controls
+                </h2>
+
+                <div class="timer-section">
+                    <div class="timer-display" id="timerDisplay">
+                        00:30:00
+                    </div>
+
+                    <div class="time-left" id="timeLeft">
+                        <span>Time left in session: <span class="value" id="timeLeftValue">30:00</span></span>
+                    </div>
+
+                    <div class="timer-inputs">
+                        <div class="input-group">
+                            <label for="hours">Hours</label>
+                            <input type="number" id="hours" min="0" max="4" value="0">
+                        </div>
+                        <div class="input-group">
+                            <label for="minutes">Minutes</label>
+                            <input type="number" id="minutes" min="0" max="59" value="30">
+                        </div>
+                        <div class="input-group">
+                            <label for="seconds">Seconds</label>
+                            <input type="number" id="seconds" min="0" max="59" value="0">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="timer-controls">
+                    <button class="btn btn-primary" id="startSessionBtn" onclick="startSession()">
+                        <span>▶</span> Start Session
+                    </button>
+                    <button class="btn btn-secondary" id="pauseSessionBtn" onclick="pauseSession()" disabled>
+                        <span>⏸</span> Pause Session
+                    </button>
+                    <button class="btn btn-primary" id="resumeSessionBtn" onclick="resumeSession()" disabled>
+                        <span>▶</span> Resume
+                    </button>
+                    <button class="btn btn-danger" id="endSessionBtn" onclick="endSession()" disabled>
+                        <span>⏹</span> End Session
+                    </button>
+                </div>
+
+                <div class="session-stats">
+                    <h3 class="stats-title">
+                        <span>📊</span>
+                        Current Session Stats
+                    </h3>
+                    <div class="stats-grid" id="sessionStats">
+                        <div class="stat-item">
+                            <div class="stat-label">Session Duration</div>
+                            <div class="stat-value" id="sessionDuration">0m</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Frames Analyzed</div>
+                            <div class="stat-value" id="framesAnalyzed">0</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Avg Neck Angle</div>
+                            <div class="stat-value" id="avgNeckAngle">--°</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Avg Back Angle</div>
+                            <div class="stat-value" id="avgBackAngle">--°</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="features">
-            <div class="feature">
-                <h3>Real-time Analysis</h3>
-                <p>Get instant feedback on your posture with our advanced AI system</p>
-            </div>
-            <div class="feature">
-                <h3>Personalized Feedback</h3>
-                <p>Receive customized recommendations to improve your sitting position</p>
-            </div>
-            <div class="feature">
-                <h3>Easy to Use</h3>
-                <p>Simple upload process and clear, actionable insights</p>
+        <div class="card">
+            <h2 class="card-title">
+                <span>💪</span>
+                Recommended Stretches
+            </h2>
+
+            <div class="stretches-grid">
+                <div class="stretch-card">
+                    <h3>Cat-Cow Pose</h3>
+                    <p>A gentle movement that loosens the spine, eases back and neck tension, and refreshes posture
+                        after sitting.</p>
+                    <a href="#" class="see-more">See more →</a>
+                </div>
+
+                <div class="stretch-card">
+                    <h3>Thoracic Rotations</h3>
+                    <p>A simple stretch that improves upper-back mobility, reduces stiffness, and helps maintain healthy
+                        posture after long sitting.</p>
+                    <a href="#" class="see-more">See more →</a>
+                </div>
+
+                <div class="stretch-card">
+                    <h3>Doorway Stretches</h3>
+                    <p>A chest-opening stretch that relieves shoulder tightness, improves posture, and counters hunching
+                        from prolonged sitting.</p>
+                    <a href="#" class="see-more">See more →</a>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
-        // Smooth Fade-in on Load
-        document.addEventListener("DOMContentLoaded", function() {
-            document.body.classList.add("loaded");
+        // Global variables
+        let stream = null;
+        let analysisInterval = null;
+        let currentSessionId = null;
+        let isSessionActive = false;
+        let isSessionPaused = false;
+        let timerInterval = null;
+
+        // Timer variables
+        let totalSeconds = 1800; // 30 minutes default
+        let remainingSeconds = 1800;
+        let sessionStartTime = null;
+
+        // Initialize webcam
+        async function initializeCamera() {
+            try {
+                const constraints = {
+                    video: {
+                        width: { ideal: 640 },
+                        height: { ideal: 480 },
+                        facingMode: "user"
+                    }
+                };
+
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
+                const video = document.getElementById('cam');
+                video.srcObject = stream;
+
+                // Hide placeholder and show video
+                document.getElementById('cameraPlaceholder').style.display = 'none';
+                video.style.display = 'block';
+
+                console.log("Camera initialized successfully");
+
+            } catch (err) {
+                console.error("Error accessing camera:", err);
+                document.getElementById('statusText').textContent = 'Camera access denied';
+                document.getElementById('statusDot').style.background = '#ef4444';
+                alert("Could not access webcam. Please make sure you've granted permission.");
+            }
+        }
+
+        // Call camera initialization
+        initializeCamera();
+
+        // Timer functions
+        function updateTimerDisplay() {
+            const hours = Math.floor(remainingSeconds / 3600);
+            const minutes = Math.floor((remainingSeconds % 3600) / 60);
+            const seconds = remainingSeconds % 60;
+
+            const timerDisplay = document.getElementById('timerDisplay');
+            timerDisplay.textContent =
+                `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+            // Update time left
+            document.getElementById('timeLeftValue').textContent =
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+            // Change color based on time
+            if (remainingSeconds < 300) { // Less than 5 minutes
+                timerDisplay.style.color = '#ef4444';
+            } else if (remainingSeconds < 600) { // Less than 10 minutes
+                timerDisplay.style.color = '#f59e0b';
+            } else {
+                timerDisplay.style.color = '#4f46e5';
+            }
+        }
+
+        function updateTimerInputs() {
+            totalSeconds =
+                (parseInt(document.getElementById('hours').value) || 0) * 3600 +
+                (parseInt(document.getElementById('minutes').value) || 0) * 60 +
+                (parseInt(document.getElementById('seconds').value) || 0);
+
+            if (totalSeconds < 60) {
+                totalSeconds = 60; // Minimum 1 minute
+                document.getElementById('minutes').value = 1;
+                document.getElementById('seconds').value = 0;
+            }
+
+            remainingSeconds = totalSeconds;
+            updateTimerDisplay();
+        }
+
+        function startTimer() {
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+
+            sessionStartTime = new Date();
+            timerInterval = setInterval(() => {
+                if (!isSessionPaused && remainingSeconds > 0) {
+                    remainingSeconds--;
+                    updateTimerDisplay();
+
+                    // Auto-end session when timer reaches 0
+                    if (remainingSeconds === 0) {
+                        endSession();
+                    }
+
+                    // Update session duration
+                    updateSessionDuration();
+                }
+            }, 1000);
+        }
+
+        function updateSessionDuration() {
+            if (sessionStartTime) {
+                const elapsed = Math.floor((new Date() - sessionStartTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                document.getElementById('sessionDuration').textContent = `${minutes}m`;
+            }
+        }
+
+        // Session control functions
+        async function startSession() {
+            if (isSessionActive) return;
+
+            // Get timer duration from inputs
+            updateTimerInputs();
+
+            try {
+                const response = await fetch('/api/start_session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    currentSessionId = data.session_id;
+                    isSessionActive = true;
+                    isSessionPaused = false;
+
+                    // Start timer
+                    startTimer();
+
+                    // Start posture analysis
+                    startPostureAnalysis();
+
+                    // Update UI
+                    document.getElementById('statusDot').className = 'status-dot recording';
+                    document.getElementById('statusText').textContent = 'Session active - Analyzing posture';
+
+                    // Update button states
+                    document.getElementById('startSessionBtn').disabled = true;
+                    document.getElementById('pauseSessionBtn').disabled = false;
+                    document.getElementById('endSessionBtn').disabled = false;
+                    document.getElementById('resumeSessionBtn').disabled = true;
+
+                    // Disable timer inputs during session
+                    ['hours', 'minutes', 'seconds'].forEach(id => {
+                        document.getElementById(id).disabled = true;
+                    });
+
+                    console.log('Session started with ID:', currentSessionId);
+
+                } else {
+                    alert('Failed to start session: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error starting session:', error);
+                alert('Failed to start session. Please try again.');
+            }
+        }
+
+        function pauseSession() {
+            if (!isSessionActive || isSessionPaused) return;
+
+            isSessionPaused = true;
+
+            // Pause analysis
+            if (analysisInterval) {
+                clearInterval(analysisInterval);
+                analysisInterval = null;
+            }
+
+            // Update UI
+            document.getElementById('statusDot').className = 'status-dot paused';
+            document.getElementById('statusText').textContent = 'Session paused';
+
+            // Update button states
+            document.getElementById('pauseSessionBtn').disabled = true;
+            document.getElementById('resumeSessionBtn').disabled = false;
+
+            console.log('Session paused');
+        }
+
+        function resumeSession() {
+            if (!isSessionActive || !isSessionPaused) return;
+
+            isSessionPaused = false;
+
+            // Resume analysis
+            startPostureAnalysis();
+
+            // Update UI
+            document.getElementById('statusDot').className = 'status-dot recording';
+            document.getElementById('statusText').textContent = 'Session active - Analyzing posture';
+
+            // Update button states
+            document.getElementById('pauseSessionBtn').disabled = false;
+            document.getElementById('resumeSessionBtn').disabled = true;
+
+            console.log('Session resumed');
+        }
+
+        async function endSession() {
+            if (!isSessionActive) return;
+
+            try {
+                const elapsedMinutes = Math.floor((new Date() - sessionStartTime) / 60000);
+
+                const response = await fetch('/api/end_session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        session_id: currentSessionId,
+                        minutes: elapsedMinutes
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Reset everything
+                    isSessionActive = false;
+                    isSessionPaused = false;
+                    currentSessionId = null;
+
+                    // Stop timer
+                    if (timerInterval) {
+                        clearInterval(timerInterval);
+                        timerInterval = null;
+                    }
+
+                    // Stop analysis
+                    if (analysisInterval) {
+                        clearInterval(analysisInterval);
+                        analysisInterval = null;
+                    }
+
+                    // Reset timer
+                    updateTimerInputs();
+
+                    // Update UI
+                    document.getElementById('statusDot').className = 'status-dot';
+                    document.getElementById('statusText').textContent = 'Session ended';
+
+                    // Reset button states
+                    document.getElementById('startSessionBtn').disabled = false;
+                    document.getElementById('pauseSessionBtn').disabled = true;
+                    document.getElementById('resumeSessionBtn').disabled = true;
+                    document.getElementById('endSessionBtn').disabled = true;
+
+                    // Enable timer inputs
+                    ['hours', 'minutes', 'seconds'].forEach(id => {
+                        document.getElementById(id).disabled = false;
+                    });
+
+                    // Reset metrics display
+                    resetMetricsDisplay();
+
+                    // Show summary
+                    alert(`Session ended successfully!\n\nDuration: ${elapsedMinutes} minutes\nCheck Statistics page for detailed analysis.`);
+
+                } else {
+                    alert('Failed to end session: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error ending session:', error);
+                alert('Failed to end session. Please try again.');
+            }
+        }
+
+        function startPostureAnalysis() {
+            if (analysisInterval) {
+                clearInterval(analysisInterval);
+            }
+
+            analysisInterval = setInterval(async () => {
+                if (!isSessionActive || isSessionPaused) return;
+
+                try {
+                    const video = document.getElementById('cam');
+                    if (!video.videoWidth || !video.videoHeight) return;
+
+                    const canvas = document.createElement('canvas');
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(video, 0, 0);
+
+                    canvas.toBlob(async (blob) => {
+                        const formData = new FormData();
+                        formData.append('frame', blob);
+
+                        // Add session ID to URL
+                        let url = '/api/analyze_frame';
+                        if (currentSessionId) {
+                            url += `?session_id=${currentSessionId}`;
+                        }
+
+                        try {
+                            const response = await fetch(url, {
+                                method: 'POST',
+                                body: formData
+                            });
+
+                            const data = await response.json();
+
+                            if (data.success) {
+                                updatePostureMetrics(data);
+                                updateSessionStats();
+                            }
+                        } catch (error) {
+                            console.error('Error analyzing frame:', error);
+                        }
+                    }, 'image/jpeg');
+
+                } catch (error) {
+                    console.error('Error in posture analysis:', error);
+                }
+            }, 2000); // Analyze every 2 seconds
+        }
+
+        function updatePostureMetrics(data) {
+            // Update metrics display
+            const metricsContainer = document.getElementById('postureMetrics');
+            metricsContainer.innerHTML = `
+                <div class="metric">
+                    <div class="metric-label">Neck Angle</div>
+                    <div class="metric-value ${getMetricClass(data.neck_angle, 60, 80)}">${data.neck_angle}°</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Back Angle</div>
+                    <div class="metric-value ${getMetricClass(data.back_angle, 0, 15, true)}">${data.back_angle}°</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Shoulder Symmetry</div>
+                    <div class="metric-value ${getMetricClass(data.shoulder_symmetry, 0, 15, true)}">${data.shoulder_symmetry}%</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Posture Status</div>
+                    <div class="metric-value ${data.status === 'Good Posture' ? 'good' : 'danger'}">${data.status}</div>
+                </div>
+            `;
+        }
+
+        function resetMetricsDisplay() {
+            const metricsContainer = document.getElementById('postureMetrics');
+            metricsContainer.innerHTML = `
+                <div class="metric">
+                    <div class="metric-label">Neck Angle</div>
+                    <div class="metric-value">--°</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Back Angle</div>
+                    <div class="metric-value">--°</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Shoulder Symmetry</div>
+                    <div class="metric-value">--%</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-label">Posture Status</div>
+                    <div class="metric-value">--</div>
+                </div>
+            `;
+
+            // Reset session stats
+            document.getElementById('sessionDuration').textContent = '0m';
+            document.getElementById('framesAnalyzed').textContent = '0';
+            document.getElementById('avgNeckAngle').textContent = '--°';
+            document.getElementById('avgBackAngle').textContent = '--°';
+        }
+
+        function getMetricClass(value, goodThreshold, warningThreshold, lowerIsBetter = false) {
+            if (lowerIsBetter) {
+                if (value <= goodThreshold) return 'good';
+                if (value <= warningThreshold) return 'warning';
+                return 'danger';
+            } else {
+                if (value >= goodThreshold) return 'good';
+                if (value >= warningThreshold) return 'warning';
+                return 'danger';
+            }
+        }
+
+        async function updateSessionStats() {
+            if (!currentSessionId) return;
+
+            try {
+                const response = await fetch('/api/session_stats');
+                const data = await response.json();
+
+                if (!data.no_session) {
+                    document.getElementById('framesAnalyzed').textContent = data.frames_analyzed;
+                    document.getElementById('avgNeckAngle').textContent = data.avg_neck_angle + '°';
+                    document.getElementById('avgBackAngle').textContent = data.avg_back_angle + '°';
+                }
+
+            } catch (error) {
+                console.error('Error updating session stats:', error);
+            }
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = '{{ url_for("logout") }}';
+            }
+        }
+
+        // Initialize timer display
+        updateTimerInputs();
+
+        // Update timer when inputs change
+        ['hours', 'minutes', 'seconds'].forEach(id => {
+            document.getElementById(id).addEventListener('change', updateTimerInputs);
+            document.getElementById(id).addEventListener('input', updateTimerInputs);
         });
 
-        // Smooth Fade-out on Navigation
-        document.querySelectorAll("a").forEach(link => {
-            link.addEventListener("click", function(e) {
-                e.preventDefault();
-                let destination = this.href;
-                document.body.style.opacity = "0";
-                setTimeout(() => {
-                    window.location.href = destination;
-                }, 500);
-            });
-        });
+        // Auto-update session stats every 30 seconds
+        setInterval(() => {
+            if (isSessionActive && !isSessionPaused) {
+                updateSessionStats();
+            }
+        }, 30000);
     </script>
 </body>
+
 </html>

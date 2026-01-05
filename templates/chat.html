@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Ergo Chat - Human Ergonomics Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 700;
+            color: #4f46e5;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: #4b5563;
+            font-weight: 500;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .nav a:hover,
+        .nav a.active {
+            background: #4f46e5;
+            color: white;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info span {
+            color: #4b5563;
+            font-weight: 500;
+        }
+
+        .logout-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+        }
+
+        .main-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 40px;
+            height: calc(100vh - 80px);
+        }
+
+        .welcome-panel {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            border-radius: 20px;
+            padding: 40px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .welcome-panel h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            line-height: 1.3;
+        }
+
+        .welcome-panel p {
+            font-size: 16px;
+            opacity: 0.9;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+
+        .suggestions {
+            margin-top: 30px;
+        }
+
+        .suggestion {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 1px solid transparent;
+        }
+
+        .suggestion:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateX(5px);
+        }
+
+        .chat-container {
+            background: white;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: 25px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .chat-header h2 {
+            color: #1f2937;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 25px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 15px 20px;
+            border-radius: 18px;
+            line-height: 1.5;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            border-bottom-right-radius: 5px;
+        }
+
+        .ai-message {
+            align-self: flex-start;
+            background: #f3f4f6;
+            color: #1f2937;
+            border-bottom-left-radius: 5px;
+        }
+
+        .message-time {
+            font-size: 12px;
+            opacity: 0.7;
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        .chat-input {
+            padding: 20px;
+            border-top: 1px solid #e5e7eb;
+            display: flex;
+            gap: 15px;
+            background: #f8fafc;
+        }
+
+        .chat-input textarea {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            resize: none;
+            font-size: 16px;
+            font-family: inherit;
+            transition: all 0.3s;
+            min-height: 60px;
+            max-height: 120px;
+        }
+
+        .chat-input textarea:focus {
+            outline: none;
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            color: white;
+            border: none;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+
+        .send-btn:hover:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 8px 25px rgba(79, 70, 229, 0.3);
+        }
+
+        .send-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .typing-indicator {
+            display: none;
+            align-self: flex-start;
+            background: #f3f4f6;
+            padding: 15px 20px;
+            border-radius: 18px;
+            border-bottom-left-radius: 5px;
+        }
+
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #9ca3af;
+            margin: 0 2px;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+
+            0%,
+            60%,
+            100% {
+                transform: translateY(0);
+            }
+
+            30% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .model-info {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            font-size: 14px;
+        }
+
+        .model-info h3 {
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .llm-options {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .llm-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .llm-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .llm-btn.active {
+            background: white;
+            color: #4f46e5;
+            font-weight: 600;
+        }
+
+        @media (max-width: 1200px) {
+            .main-content {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+
+            .welcome-panel {
+                order: 2;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 15px 20px;
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .nav {
+                gap: 15px;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .message {
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="logo">
+            <span>🧘</span>
+            <span>Human Ergonomics Assistant</span>
+        </div>
+        <div class="nav">
+            <a href="{{ url_for('index') }}">Home</a>
+            <a href="{{ url_for('statistics') }}">View Statistics</a>
+            <a href="{{ url_for('ergo_chat') }}" class="active">Ergo Chat</a>
+        </div>
+        <div class="user-info">
+            <span>Welcome, {{ username }}</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div class="welcome-panel">
+            <h1>Welcome, {{ username }}</h1>
+            <p>Ask questions about posture, ergonomics, stretches, or any workplace wellness topics. Our AI assistant
+                powered by Llama 3.2 is here to help!</p>
+
+            <div class="suggestions">
+                <div class="suggestion" onclick="useSuggestion('How can I improve my sitting posture at my desk?')">
+                    "How can I improve my sitting posture at my desk?"
+                </div>
+                <div class="suggestion" onclick="useSuggestion('What are the best stretches for lower back pain?')">
+                    "What are the best stretches for lower back pain?"
+                </div>
+                <div class="suggestion" onclick="useSuggestion('How should I set up my ergonomic workstation?')">
+                    "How should I set up my ergonomic workstation?"
+                </div>
+                <div class="suggestion" onclick="useSuggestion('How often should I take breaks from sitting?')">
+                    "How often should I take breaks from sitting?"
+                </div>
+            </div>
+
+            <div class="model-info">
+                <h3>🤖 Powered by Llama 3.2</h3>
+                <p>Using your local LLM for private, offline ergonomic advice</p>
+            </div>
+        </div>
+
+        <div class="chat-container">
+            <div class="chat-header">
+                <h2>
+                    <span>💬</span>
+                    Ergo Chat Assistant
+                </h2>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="message ai-message">
+                    Hello! I'm your ergonomic assistant powered by Llama 3.2. I can help you with posture advice,
+                    stretch recommendations, ergonomic setup tips, and workplace wellness guidance. How can I assist you
+                    today?
+                    <div class="message-time" id="initialTime">Just now</div>
+                </div>
+            </div>
+
+            <div class="typing-indicator" id="typingIndicator">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <div class="chat-input">
+                <textarea id="messageInput" placeholder="Ask about ergonomics, posture, stretches..." rows="1"
+                    oninput="autoResize(this)" onkeydown="handleKeyPress(event)"></textarea>
+                <button class="send-btn" id="sendButton" onclick="sendMessage()">
+                    ➤
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatMessages = document.getElementById('chatMessages');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const typingIndicator = document.getElementById('typingIndicator');
+
+        // Store chat history
+        let chatHistory = [];
+
+        function autoResize(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        function useSuggestion(text) {
+            messageInput.value = text;
+            autoResize(messageInput);
+            messageInput.focus();
+        }
+
+        function formatTime() {
+            const now = new Date();
+            return now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function addMessage(content, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : 'ai-message'}`;
+            messageDiv.innerHTML = `
+                ${content}
+                <div class="message-time">${formatTime()}</div>
+            `;
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Store in history
+            chatHistory.push({
+                role: isUser ? 'user' : 'assistant',
+                content: content,
+                time: new Date().toISOString()
+            });
+
+            // Keep only last 20 messages in memory
+            if (chatHistory.length > 20) {
+                chatHistory = chatHistory.slice(-20);
+            }
+        }
+
+        async function sendMessage() {
+            const message = messageInput.value.trim();
+            if (!message) return;
+
+            // Add user message
+            addMessage(message, true);
+            messageInput.value = '';
+            autoResize(messageInput);
+
+            // Show typing indicator
+            typingIndicator.style.display = 'block';
+            sendButton.disabled = true;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            try {
+                const response = await fetch('/api/chat_with_llm', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: message,
+                        history: chatHistory
+                    })
+                });
+
+                const data = await response.json();
+
+                // Hide typing indicator
+                typingIndicator.style.display = 'none';
+                sendButton.disabled = false;
+
+                // Add AI response
+                if (data.success) {
+                    addMessage(data.reply, false);
+                } else {
+                    addMessage('Sorry, I encountered an error. Please try again.', false);
+                    console.error('Chat error:', data.error);
+                }
+
+            } catch (error) {
+                console.error('Error sending message:', error);
+
+                // Hide typing indicator
+                typingIndicator.style.display = 'none';
+                sendButton.disabled = false;
+
+                // Add error message
+                addMessage('Sorry, I could not connect to the AI assistant. Please check if your local Llama 3.2 is running.', false);
+            }
+        }
+
+        function logout() {
+            if (confirm('Are you sure you want to logout?')) {
+                window.location.href = '{{ url_for("logout") }}';
+            }
+        }
+
+        // Initialize
+        messageInput.focus();
+        sendButton.addEventListener('click', sendMessage);
+
+        // Update initial timestamp
+        document.getElementById('initialTime').textContent = formatTime();
+    </script>
+</body>
+
+</html>
